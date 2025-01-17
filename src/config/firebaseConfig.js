@@ -3,7 +3,7 @@ const admin = require('firebase-admin')
 const dotenv = require('dotenv')
 dotenv.config()
 
-const serviceAccount = require('./credentialsFirebase.json')
+const serviceAccount = require('./credentialsFirebaseTest.json')
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
