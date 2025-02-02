@@ -165,6 +165,7 @@ const register = async (req, res) => {
       ...(rol === 'visitor' && {
         dni,
         subname,
+        logo: logoId,
         studies,
         image: profileImagenUrl,
         cv: cvUrl,
@@ -382,7 +383,8 @@ const getAllUsers = async (req, res) => {
  */
 
 const getUserById = async (req, res) => {
-  const companyID = req.user.rol === 'co' ? req.user.id : req.params.id
+  // const companyID = req.user.rol === 'co' ? req.user.id : req.params.id
+  const companyID = req.user.id ? req.user.id : req.params.id
 
   try {
     // Obtener el usuario por ID
@@ -470,24 +472,20 @@ const updateUser = async (req, res) => {
 
     if (rol === 'co') {
       if (!cif) {
-        return res
-          .status(400)
-          .json({
-            error: 'invalid_cif',
-            message: 'CIF is required for Company.'
-          })
+        return res.status(400).json({
+          error: 'invalid_cif',
+          message: 'CIF is required for Company.'
+        })
       }
       userData.cif = cif
     }
 
     if (rol === 'visitor') {
       if (!dni || !studies) {
-        return res
-          .status(400)
-          .json({
-            error: 'invalid_dni',
-            message: 'DNI and studies are required for Visitor.'
-          })
+        return res.status(400).json({
+          error: 'invalid_dni',
+          message: 'DNI and studies are required for Visitor.'
+        })
       }
       userData.dni = dni
       userData.subname = subname
