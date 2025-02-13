@@ -384,7 +384,8 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   // const companyID = req.user.rol === 'co' ? req.user.id : req.params.id
-  const companyID = req.user.id ? req.user.id : req.params.id
+  const companyID = req.user.id || req.params.id
+  // const companyID = req.user.id ? req.user.id : req.params.id
 
   try {
     // Obtener el usuario por ID
