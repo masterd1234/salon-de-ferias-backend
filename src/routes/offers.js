@@ -1,10 +1,10 @@
 /**
  * @module OffersRoutes
  */
-const express = require('express');
-const router = express.Router();
-const offersController = require('../controllers/offersController');
-const { verifyToken } = require('../middlewares/authMiddleware');
+const express = require('express')
+const router = express.Router()
+const offersController = require('../controllers/offersController')
+const { verifyToken } = require('../middlewares/authMiddleware')
 
 /**
  * @route POST /add/:id?
@@ -15,15 +15,22 @@ const { verifyToken } = require('../middlewares/authMiddleware');
  * @middleware next - Valida el acceso según el rol del usuario.
  * @returns {Object} JSON con el mensaje de éxito y el ID de la oferta creada.
  */
-router.post('/add/:id?', verifyToken, (req, res, next) => {
-    const { rol } = req.user;
+router.post(
+  '/add/:id?',
+  verifyToken,
+  (req, res, next) => {
+    const { rol } = req.user
 
     if (rol === 'visitor') {
-        return res.status(403).json({ error: 'Access denied: Visitors cannot add offers.' });
+      return res
+        .status(403)
+        .json({ error: 'Access denied: Visitors cannot add offers.' })
     }
 
-    next();
-}, offersController.addOffers);
+    next()
+  },
+  offersController.addOffers
+)
 
 /**
  * @route GET /company/:id?
@@ -34,7 +41,7 @@ router.post('/add/:id?', verifyToken, (req, res, next) => {
  * @middleware next - Valida el acceso según el rol del usuario.
  * @returns {Object} JSON con las ofertas de la empresa o un mensaje de error.
  */
-router.get('/company/:id?', verifyToken, offersController.getOffersById);
+router.get('/company/:id?', verifyToken, offersController.getOffersById)
 
 /**
  * @route DELETE /delete/:id
@@ -45,14 +52,21 @@ router.get('/company/:id?', verifyToken, offersController.getOffersById);
  * @middleware next - Valida el acceso según el rol del usuario.
  * @returns {Object} JSON con un mensaje de éxito o error.
  */
-router.delete('/delete/:id', verifyToken, (req, res, next) => {
-    const { rol } = req.user;
+router.delete(
+  '/delete/:id',
+  verifyToken,
+  (req, res, next) => {
+    const { rol } = req.user
 
     if (rol === 'visitor') {
-        return res.status(403).json({ error: 'Access denied: Visitors cannot delete offers.' });
+      return res
+        .status(403)
+        .json({ error: 'Access denied: Visitors cannot delete offers.' })
     }
-    next();
-}, offersController.deleteOfferById);
+    next()
+  },
+  offersController.deleteOfferById
+)
 
 /**
  * @route PUT /update/:id
@@ -63,19 +77,31 @@ router.delete('/delete/:id', verifyToken, (req, res, next) => {
  * @middleware next - Valida el acceso según el rol del usuario.
  * @returns {Object} JSON con un mensaje de éxito o error.
  */
-router.put('/update/:id', verifyToken, (req, res, next) => {
-    const { rol } = req.user;
+router.put(
+  '/update/:id',
+  verifyToken,
+  (req, res, next) => {
+    const { rol } = req.user
 
     if (rol === 'visitor') {
-        return res.status(403).json({ error: 'Access denied: Visitors cannot update offers.' });
+      return res
+        .status(403)
+        .json({ error: 'Access denied: Visitors cannot update offers.' })
     }
 
     if (rol === 'co' && req.params.id && req.params.id !== req.user.id) {
-        return res.status(403).json({ error: 'Access denied: Companies cannot update offers for other companies.' });
+      return res
+        .status(403)
+        .json({
+          error:
+            'Access denied: Companies cannot update offers for other companies.'
+        })
     }
 
-    next();
-}, offersController.updateOfferById);
+    next()
+  },
+  offersController.updateOfferById
+)
 
 /**
  * @route GET /all
@@ -84,7 +110,7 @@ router.put('/update/:id', verifyToken, (req, res, next) => {
  * @middleware verifyToken - Verifica el token JWT para autenticación.
  * @returns {Object} JSON con todas las ofertas o un mensaje de error.
  */
-router.get('/all', verifyToken, offersController.getAllOffers);
+router.get('/all', verifyToken, offersController.getAllOffers)
 
 /**
  * @route GET /search
@@ -93,6 +119,6 @@ router.get('/all', verifyToken, offersController.getAllOffers);
  * @middleware verifyToken - Verifica el token JWT para autenticación.
  * @returns {Object} JSON con las ofertas filtradas o un mensaje de error.
  */
-router.get('/search', verifyToken, offersController.searchOffers);
+router.get('/search', verifyToken, offersController.searchOffers)
 
-module.exports = router;
+module.exports = router

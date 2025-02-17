@@ -111,7 +111,8 @@ const addOffers = async (req, res) => {
 const getOffersById = async (req, res) => {
   try {
     // Determinar el ID según el rol
-    const id = req.user.rol === 'admin' ? req.params.id : req.user.id
+    const id = req.user.rol === 'visitor' ? req.params.id : req.user.id
+    // const id = req.user.id || req.params.id
 
     if (!id) {
       return res.status(400).json({ message: 'El ID es obligatorio' })

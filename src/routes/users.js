@@ -185,12 +185,9 @@ router.get(
   (req, res, next) => {
     // Validar que el rol del usuario sea "admin"
     if (req.user.rol !== 'admin') {
-      return res
-        .status(403)
-        .json({
-          message:
-            'Access denied: Only administrators can access this resource.'
-        })
+      return res.status(403).json({
+        message: 'Access denied: Only administrators can access this resource.'
+      })
     }
     next() // Continuar con el controlador si es admin
   },
