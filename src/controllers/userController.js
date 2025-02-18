@@ -8,7 +8,10 @@
 const { admin, db } = require('../config/firebaseConfig')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { uploadFileToDrive } = require('../config/googleDrive')
+const {
+  uploadFileToDrive,
+  deleteFileFromDrive
+} = require('../config/googleDrive')
 const fs = require('fs')
 
 /**
@@ -720,7 +723,8 @@ const getCompanyAll = async (req, res) => {
  */
 const updateLogo = async (req, res) => {
   const id = req.user.rol === 'admin' ? req.params.id : req.user.id
-  const logoUpload = req.files?.logo ? req.files.logo[0] : null // Nuevo archivo de logo
+  // const logoUpload = req.files?.logo ? req.files.logo[0] : null // Nuevo archivo de logo
+  const logoUpload = req?.file ? req?.file : null // Nuevo archivo de logo
 
   if (!logoUpload) {
     return res.status(400).json({ message: 'No logo file provided.' })
@@ -751,7 +755,9 @@ const updateLogo = async (req, res) => {
 
     // Eliminar el logo anterior de Google Drive
     const previousLogoFileId = logoData.url.split('id=')[1].split('&')[0] // Extraer el file ID del URL
-    await admin.drive.files.delete({ fileId: previousLogoFileId })
+    console.log('previousLogoFileId', previousLogoFileId)
+    // await admin.drive.files?.delete({ fileId: previousLogoFileId })
+    await deleteFileFromDrive(previousLogoFileId)
 
     // Subir el nuevo logo a Google Drive
     const newLogoResponse = await uploadFileToDrive(logoUpload, 'logos')

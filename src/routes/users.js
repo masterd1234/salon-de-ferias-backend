@@ -195,7 +195,7 @@ router.get(
 )
 
 router.put(
-  '/users/logo/:id?',
+  '/logo/:id',
   upload.single('logo'), // Middleware para subir un único archivo
   verifyToken,
   usersController.updateLogo
