@@ -4,7 +4,7 @@
  * Controlador de usuarios.
  * Define la lógica para manejar las solicitudes relacionadas con los usuarios.
  */
-
+require('dotenv').config()
 const { admin, db } = require('../config/firebaseConfig')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -13,6 +13,8 @@ const {
   deleteFileFromDrive
 } = require('../config/googleDrive')
 const fs = require('fs')
+
+const API_URL = process.env.API_URL || 'http://localhost:3000'
 
 /**
  * Registra un nuevo usuario en el sistema.
@@ -228,8 +230,7 @@ const getAllCompany = async (req, res) => {
           if (!logoSnapshot.empty) {
             const logoDoc = logoSnapshot.docs[0] // Tomar el primer documento encontrado
             const logoData = logoDoc.data()
-            logoUrl =
-              'https://backend-node-wpf9.onrender.com/proxy?url=' + logoData.url // Extraer la URL del logo
+            logoUrl = API_URL + '/proxy?url=' + logoData.url // Extraer la URL del logo
           }
         }
 
@@ -356,8 +357,7 @@ const getAllUsers = async (req, res) => {
           if (!logoSnapshot.empty) {
             const logoDoc = logoSnapshot.docs[0] // Tomar el primer documento encontrado
             const logoData = logoDoc.data()
-            logoUrl =
-              'https://backend-node-wpf9.onrender.com/proxy?url=' + logoData.url // Extraer la URL del logo
+            logoUrl = API_URL + '/proxy?url=' + logoData.url // Extraer la URL del logo
           }
         }
 
@@ -412,8 +412,7 @@ const getUserById = async (req, res) => {
       if (!logoSnapshot.empty) {
         const logoDoc = logoSnapshot.docs[0] // Tomar el primer documento encontrado
         const logoData = logoDoc.data()
-        logoUrl =
-          'https://backend-node-wpf9.onrender.com/proxy?url=' + logoData.url // Extraer la URL del logo
+        logoUrl = API_URL + '/proxy?url=' + logoData.url // Extraer la URL del logo
       }
     }
 
@@ -595,7 +594,7 @@ const getCompanyAll = async (req, res) => {
           return {
             id: doc.id,
             ...filtaredLogoData,
-            url: `https://backend-node-wpf9.onrender.com/proxy?url=${filtaredLogoData.url}`
+            url: `${API_URL}/proxy?url=${filtaredLogoData.url}`
           }
         })
 
@@ -654,7 +653,7 @@ const getCompanyAll = async (req, res) => {
                   id: standSnapshot.id,
                   ...filteredData,
                   name: filteredData.url.name,
-                  url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+                  url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
                 }
               })()
             : null
@@ -665,7 +664,7 @@ const getCompanyAll = async (req, res) => {
                 return {
                   id: modelSnapshot.id,
                   ...filteredData,
-                  url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+                  url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
                 }
               })()
             : null

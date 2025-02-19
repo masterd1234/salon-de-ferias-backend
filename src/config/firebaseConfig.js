@@ -6,8 +6,8 @@ dotenv.config()
 const serviceAccount = require('./credentialsFirebaseTest.json')
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://palacio-de-ferias.firebaseio.com'
+  credential: admin.credential.cert(serviceAccount)
+  // databaseURL: 'https://palacio-de-ferias.firebaseio.com'
 })
 
 const db = admin.firestore()

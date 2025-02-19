@@ -5,6 +5,7 @@
  * la creación, obtención, actualización, eliminación y la obtención de modelos y stands relacionados.
  */
 
+require('dotenv').config()
 const { db, admin } = require('../config/firebaseConfig')
 const jwt = require('jsonwebtoken')
 const {
@@ -13,6 +14,8 @@ const {
   deleteFileFromDrive
 } = require('../config/googleDrive')
 const fs = require('fs')
+
+const API_URL = process.env.API_URL || 'http://localhost:3000'
 
 /**
  * @function createDesign
@@ -68,8 +71,7 @@ const createDesign = async (req, res) => {
     // Subir archivo de banner a Google Drive
     if (bannerUpload) {
       const file = await uploadFileToDrive(bannerUpload, 'banners')
-      bannerUrl =
-        'https://backend-node-wpf9.onrender.com/proxy?url=' + file.webViewLink
+      bannerUrl = API_URL + '/proxy?url=' + file.webViewLink
       fs.unlink(bannerUpload.path, (err) => {
         if (err) console.error('Error deleting temporary file:', err)
       })
@@ -78,8 +80,7 @@ const createDesign = async (req, res) => {
     // Subir archivo de póster a Google Drive
     if (posterUpload) {
       const file = await uploadFileToDrive(posterUpload, 'posters')
-      posterUrl =
-        'https://backend-node-wpf9.onrender.com/proxy?url=' + file.webViewLink
+      posterUrl = API_URL + '/proxy?url=' + file.webViewLink
       fs.unlink(posterUpload.path, (err) => {
         if (err) console.error('Error deleting temporary file:', err)
       })
@@ -118,9 +119,7 @@ const createDesign = async (req, res) => {
     const logo = logoDoc
       ? {
           id: logoDoc.id,
-          url: `https://backend-node-wpf9.onrender.com/proxy?url=${
-            logoDoc.data().url
-          }`
+          url: `${API_URL}/proxy?url=${logoDoc.data().url}`
         }
       : null
 
@@ -225,7 +224,7 @@ const getDesign = async (req, res) => {
             id: standSnapshot.id,
             ...filteredData,
             name: filteredData.url.name,
-            url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+            url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
           }
         })()
       : null
@@ -245,7 +244,7 @@ const getDesign = async (req, res) => {
             id: modelSnapshot.id,
             ...filteredData,
 
-            url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+            url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
           }
         })()
       : null
@@ -309,7 +308,7 @@ const getAllDesigns = async (req, res) => {
                 id: standSnapshot.id,
                 ...filteredData,
                 name: filteredData.url.name,
-                url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+                url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
               }
             })()
           : null
@@ -321,7 +320,7 @@ const getAllDesigns = async (req, res) => {
               return {
                 id: modelSnapshot.id,
                 ...filteredData,
-                url: `https://backend-node-wpf9.onrender.com/proxy?url=${filteredData.url.fileUrl}`
+                url: `${API_URL}/proxy?url=${filteredData.url.fileUrl}`
               }
             })()
           : null
@@ -466,8 +465,7 @@ const updateDesign = async (req, res) => {
     // Subir nuevo archivo de banner a Google Drive
     if (bannerUpload) {
       const file = await uploadFileToDrive(bannerUpload, 'banners')
-      newBannerUrl =
-        'https://backend-node-wpf9.onrender.com/proxy?url=' + file.webViewLink
+      newBannerUrl = API_URL + '/proxy?url=' + file.webViewLink
       fs.unlink(bannerUpload.path, (err) => {
         if (err) console.error('Error deleting temporary file:', err)
       })
@@ -476,8 +474,7 @@ const updateDesign = async (req, res) => {
     // Subir nuevo archivo de póster a Google Drive
     if (posterUpload) {
       const file = await uploadFileToDrive(posterUpload, 'posters')
-      newPosterUrl =
-        'https://backend-node-wpf9.onrender.com/proxy?url=' + file.webViewLink
+      newPosterUrl = API_URL + '/proxy?url=' + file.webViewLink
       fs.unlink(posterUpload.path, (err) => {
         if (err) console.error('Error deleting temporary file:', err)
       })

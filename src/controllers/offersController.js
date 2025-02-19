@@ -1,7 +1,10 @@
 /**
  * @module OffersController
  */
+require('dotenv').config()
 const { db, admin } = require('../config/firebaseConfig')
+
+const API_URL = process.env.API_URL || 'http://localhost:3000'
 
 /**
  * Agrega una nueva oferta de trabajo.
@@ -58,9 +61,7 @@ const addOffers = async (req, res) => {
     const logo = logoDoc
       ? {
           id: logoDoc.id,
-          url: `https://backend-node-wpf9.onrender.com/proxy?url=${
-            logoDoc.data().url
-          }`
+          url: `${API_URL}/proxy?url=${logoDoc.data().url}`
         }
       : null
 
