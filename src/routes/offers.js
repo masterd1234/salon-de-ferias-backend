@@ -90,12 +90,10 @@ router.put(
     }
 
     if (rol === 'co' && req.params.id && req.params.id !== req.user.id) {
-      return res
-        .status(403)
-        .json({
-          error:
-            'Access denied: Companies cannot update offers for other companies.'
-        })
+      return res.status(403).json({
+        error:
+          'Access denied: Companies cannot update offers for other companies.'
+      })
     }
 
     next()
@@ -120,5 +118,7 @@ router.get('/all', verifyToken, offersController.getAllOffers)
  * @returns {Object} JSON con las ofertas filtradas o un mensaje de error.
  */
 router.get('/search', verifyToken, offersController.searchOffers)
+
+router.post('/apply/:offerId', verifyToken, offersController.applyToOffer)
 
 module.exports = router

@@ -322,11 +322,58 @@ const searchOffers = async (req, res) => {
   }
 }
 
+const applyToOffer = async (req, res) => {
+  const { id: userId, rol } = req.user // ID del usuario desde el token
+  const { offerId } = req.params // ID de la oferta desde la URL
+
+  try {
+    if (rol !== 'visitor') {
+      return res
+        .status(403)
+        .json({ error: 'Solo los visitantes pueden inscribirse en ofertas.' })
+    }
+
+    // Verificar si la oferta existe
+    const offerSnapshot = await db.collection('offers').doc(offerId).get()
+    if (!offerSnapshot.exists) {
+      return res.status(404).json({ error: 'Oferta no encontrada.' })
+    }
+
+    // Verificar si el usuario ya está inscrito
+    const userOfferSnapshot = await db
+      .collection('user-offer')
+      .where('userId', '==', userId)
+      .where('offerId', '==', offerId)
+      .get()
+
+    if (!userOfferSnapshot.empty) {
+      return res
+        .status(400)
+        .json({ error: 'Ya estás inscrito en esta oferta.' })
+    }
+
+    // Inscribir al usuario en la oferta
+    const newUserOffer = {
+      userId,
+      offerId,
+      appliedAt: admin.firestore.Timestamp.now()
+    }
+
+    await db.collection('user-offer').add(newUserOffer)
+
+    res.status(201).json({ message: 'Inscripción exitosa.' })
+  } catch (error) {
+    console.error('Error al inscribirse en la oferta:', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
 module.exports = {
   addOffers,
   getOffersById,
   deleteOfferById,
   updateOfferById,
   getAllOffers,
-  searchOffers
+  searchOffers,
+  applyToOffer
 }
