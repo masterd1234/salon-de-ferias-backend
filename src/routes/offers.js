@@ -121,4 +121,6 @@ router.get('/search', verifyToken, offersController.searchOffers)
 
 router.post('/apply/:offerId', verifyToken, offersController.applyToOffer)
 
+router.get('/visitor/:id?', verifyToken, offersController.getOffersUserById)
+
 module.exports = router

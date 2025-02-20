@@ -369,6 +369,63 @@ const applyToOffer = async (req, res) => {
   }
 }
 
+const getOffersUserById = async (req, res) => {
+  try {
+    // const { visitorId } = req.params
+    const id = req.params.id ? req.params.id : req.user.id
+
+    if (!id) {
+      return res.status(400).json({ error: 'El visitorId es obligatorio' })
+    }
+
+    // 1️⃣ Obtener todas las ofertas aplicadas por el visitante
+    const userOffersSnapshot = await db
+      .collection('user-offer')
+      .where('userId', '==', id)
+      .get()
+
+    if (userOffersSnapshot.empty) {
+      return res
+        .status(404)
+        .json({ message: 'No se encontraron ofertas aplicadas' })
+    }
+
+    // 2️⃣ Extraer offerIds de las ofertas aplicadas
+    const appliedOffers = []
+    const offerIds = []
+
+    userOffersSnapshot.forEach((doc) => {
+      const data = doc.data()
+      appliedOffers.push({ id: doc.id, ...data })
+      offerIds.push(data.offerId)
+    })
+
+    // 3️⃣ Consultar la colección 'offers' para obtener detalles de cada oferta
+    const offersData = {}
+    const offerPromises = offerIds.map(async (offerId) => {
+      const offerDoc = await db.collection('offers').doc(offerId).get()
+      if (offerDoc.exists) {
+        offersData[offerId] = offerDoc.data()
+      }
+    })
+
+    await Promise.all(offerPromises)
+
+    // 4️⃣ Fusionar datos de 'user-offer' con los detalles de 'offers'
+    const offers = appliedOffers.map(
+      (app) =>
+        offersData[app.offerId] // Si no se encuentra la oferta, se asigna null
+    )
+
+    return res
+      .status(200)
+      .json({ message: 'Ofertas obtenidas con éxito', offers })
+  } catch (error) {
+    console.error('Error obteniendo las ofertas aplicadas:', error)
+    return res.status(500).json({ error: 'Error del servidor' })
+  }
+}
+
 module.exports = {
   addOffers,
   getOffersById,
@@ -376,5 +433,6 @@ module.exports = {
   updateOfferById,
   getAllOffers,
   searchOffers,
-  applyToOffer
+  applyToOffer,
+  getOffersUserById
 }
