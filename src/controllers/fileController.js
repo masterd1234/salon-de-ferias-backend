@@ -113,4 +113,106 @@ const updateFiles = async (req, res) => {
   }
 }
 
-module.exports = { updateFiles }
+const addFiles = async (req, res) => {
+  const id = req.user.rol === 'co' ? req.user.id : req.params.id
+  const file = req.file
+  try {
+    if (!file) {
+      return res.status(400).json({ message: 'No hay archivo' })
+    }
+
+    const fileResponse = await uploadFileToDrive(file, 'files')
+    fileUrl = fileResponse.webViewLink
+
+    // Buscar si ya existe un documento en la colección 'archivo' con el companyID
+    const fileSnapshot = await db
+      .collection('download-files')
+      .where('companyId', '==', id)
+      .get()
+
+    if (!fileSnapshot.empty) {
+      // Si existe un documento, obtener el primer documento
+      const fileDoc = fileSnapshot.docs[0]
+      const fileData = fileDoc.data()
+
+      // Verificar si la URL ya está en el array
+      if (fileData.urls.includes(fileUrl)) {
+        return res
+          .status(400)
+          .json({ message: 'El archivo ya existe en la lista' })
+      }
+
+      // Agregar la nueva URL al array existente
+      const updatedUrls = [...fileData.urls, fileUrl]
+      await db
+        .collection('download-files')
+        .doc(fileDoc.id)
+        .update({ urls: updatedUrls })
+
+      return res.status(200).json({
+        message: 'Archivo añadido al array existente',
+        id: fileDoc.id,
+        urls: updatedUrls
+      })
+    } else {
+      // Si no existe un documento, crear uno nuevo con el array de URLs
+      const newFile = {
+        companyId: id,
+        urls: [fileUrl]
+      }
+
+      const fileRef = await db.collection('download-files').add(newFile)
+
+      return res.status(201).json({
+        message: 'Documento de archivo creado y archivo añadido',
+        id: fileRef.id,
+        urls: newFile.urls
+      })
+    }
+  } catch (error) {
+    console.error('Error al agregar archivo', error)
+    return res.status(500).json({
+      message: 'Error al agregar archivo',
+      error: error.message
+    })
+  }
+}
+
+const getFilesById = async (req, res) => {
+  try {
+    // Obtener el companyID según el rol del usuario
+    const companyID = req.user.rol === 'co' ? req.user.id : req.params.id
+
+    if (!companyID) {
+      return res.status(400).json({ message: 'El companyID es obligatorio' })
+    }
+
+    // Consultar los archivos con el companyID
+    const filesSnapshot = await db
+      .collection('download-files')
+      .where('companyId', '==', companyID)
+      .get()
+
+    if (filesSnapshot.empty) {
+      return res
+        .status(404)
+        .json({ message: 'No se encontraron archivos para esta compañía' })
+    }
+
+    // Mapear los documentos encontrados
+    const files = filesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+
+    return res.status(200).json(files)
+  } catch (error) {
+    console.error('Error al obtener archivos:', error)
+    return res.status(500).json({
+      message: 'Error al obtener archivos',
+      error: error.message
+    })
+  }
+}
+
+module.exports = { updateFiles, addFiles, getFilesById }
