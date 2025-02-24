@@ -123,6 +123,7 @@ const addFiles = async (req, res) => {
 
     const fileResponse = await uploadFileToDrive(file, 'files')
     fileUrl = fileResponse.webViewLink
+    fileName = file.originalname
 
     // Buscar si ya existe un documento en la colección 'archivo' con el companyID
     const fileSnapshot = await db
@@ -136,29 +137,29 @@ const addFiles = async (req, res) => {
       const fileData = fileDoc.data()
 
       // Verificar si la URL ya está en el array
-      if (fileData.urls.includes(fileUrl)) {
+      if (fileData.docs[0].name.includes(fileName)) {
         return res
           .status(400)
           .json({ message: 'El archivo ya existe en la lista' })
       }
 
       // Agregar la nueva URL al array existente
-      const updatedUrls = [...fileData.urls, fileUrl]
+      const updatedDocs = [...fileData.docs, { name: fileName, url: fileUrl }]
       await db
         .collection('download-files')
         .doc(fileDoc.id)
-        .update({ urls: updatedUrls })
+        .update({ docs: updatedDocs })
 
       return res.status(200).json({
         message: 'Archivo añadido al array existente',
         id: fileDoc.id,
-        urls: updatedUrls
+        docs: updatedDocs
       })
     } else {
       // Si no existe un documento, crear uno nuevo con el array de URLs
       const newFile = {
         companyId: id,
-        urls: [fileUrl]
+        docs: [{ name: fileName, url: fileUrl }]
       }
 
       const fileRef = await db.collection('download-files').add(newFile)
@@ -166,7 +167,7 @@ const addFiles = async (req, res) => {
       return res.status(201).json({
         message: 'Documento de archivo creado y archivo añadido',
         id: fileRef.id,
-        urls: newFile.urls
+        docs: newFile.docs
       })
     }
   } catch (error) {
@@ -205,7 +206,9 @@ const getFilesById = async (req, res) => {
       ...doc.data()
     }))
 
-    return res.status(200).json(files)
+    return res
+      .status(200)
+      .json({ companyID: files[0].companyId, docs: files[0].docs })
   } catch (error) {
     console.error('Error al obtener archivos:', error)
     return res.status(500).json({
