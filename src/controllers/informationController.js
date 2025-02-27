@@ -235,7 +235,8 @@ const addLinksCalendar = async (req, res) => {
 }
 
 const getLinksCalendar = async (req, res) => {
-  const companyID = req.user.id ? req.user.id : req.params.id
+  const companyID = req.user.rol === 'co' ? req.user.id : req.params.id
+
   try {
     // Verificar que companyID no esté vacío
     if (!companyID) {
