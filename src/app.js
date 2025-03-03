@@ -18,7 +18,8 @@ const corsOptions = {
   origin: [
     'http://localhost:4200',
     'http://localhost:3000',
-    'https://salon-feria-frontend.vercel.app'
+    'https://salon-feria-frontend.vercel.app',
+    'https://salon-de-ferias-frontend.vercel.app'
   ], // Dominios permitidos
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos HTTP permitidos
   credentials: true // Permitir cookies y encabezados de autenticación
