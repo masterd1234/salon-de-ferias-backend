@@ -4,7 +4,7 @@ const path = require('path')
 
 // Configurar autenticación con Google Drive
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'src/config/credentialsDrive.json', // Ruta al archivo JSON de credenciales
+  keyFile: '/etc/secrets/credentialsDrive.json', // Ruta al archivo JSON de credenciales
   scopes: ['https://www.googleapis.com/auth/drive']
 })
 
