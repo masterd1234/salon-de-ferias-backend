@@ -2,8 +2,8 @@
 node_modules/
 models/
 
-udloads/
-uploads/
+/udloads
+/uploads
 
 credentialsFirebase.json
 credentialsFirebaseTest.json
